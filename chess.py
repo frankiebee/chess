@@ -506,7 +506,6 @@ class Piece(object):
 	def mov_handler(self):
 		pass
 		
-
 class King(object):
 	def __init__(self,player,game):
 		self.king = 0 
@@ -755,8 +754,6 @@ class Game(object):
 		\\\OPTIONS Menue///
 		|HELP        : Default will show options , 
 		help option will show details on opion
-
-		|PATH       : shows the possibl paths for a piece
 		
 		|CHECK	    : shows the peice that puts you in check
 		
@@ -774,14 +771,14 @@ class Game(object):
 		\\\OPTIONS Menue///
 		|HELP        : Default will show options , 
 		help option will show details on opion
-
-		|PATH postion: shows the possibl moves for a piece.
 		
 		|CHECK	    : shows the peice that puts you in check.
 		
 		|MENUE		: shows Options menue.
 		
 		|LAST MOVE  : shows last made move.
+		
+		|SETINGS 	: ...
 		"""
 		option = option.upper()
 		print option
@@ -798,6 +795,7 @@ class Game(object):
 				print menue
 				exits = raw_input('HIT ENTER TO EXIT OPTIONS MENUE')
 				return 'stop'
+		
 		elif option == 'CHECK':
 			this = King(player,game)
 			check = this.handler()
@@ -805,13 +803,7 @@ class Game(object):
 				return game[this.threat][0],game[this.threat][-1][-3]
 			else: 
 				return 'You are not in CHECK' 
-		elif option.find('PATH') != -1:
-			this = option[-2]+option[-1]
-			check = self.trans(this + 'a1')
-			play = game[check[0]][-1]
-			po = Piece(player,play,game)
-			pos = pos_handler()
-			
+						
 		else: 
 		 	return 'continue'	
 	
@@ -835,6 +827,7 @@ class Game(object):
 				return u'\u265D' #bishiop white	
 			elif thing[-2] == 'H':	
 				return u'\u265E' #knight white	
+	
 	def trans(self,move):
 		try:
 			move = move.strip(' ')
@@ -853,13 +846,6 @@ class Game(object):
 			rmove = [board.check(s),board.check(m)]
 		return rmove 
 
-def show_me(state,type):
-	pass 
-
-def update(new,start):
-	pass  		
-def back_track(old,start):
-	pass		
 def getmove(player):
 	move = raw_input('%s your move =>'%player[0])
 	while True:
@@ -875,14 +861,48 @@ def getmove(player):
 			print opponent, 'Captured Pieces %s '%o
 			print display
 			print 'Captured Pieces %s'%p
+			del sboard
 			move = raw_input('%s your move =>'%player[0])
 		elif this == 'continue':
 			rmove = game.trans(move)
 			break			
 	return rmove
+def show_me(state,type):
+	pass 
+
+def update(move,replace,start):
+	s = move[0]
+	m = move[1]
+	start[s].remove(start[s][-1])
+	start[s].append([' ',' ',0])
+	start[m].remove(start[m][-1])
+	start[m].append(replace)
+	return start
+
+def back_track(move,rplace,back_track,start):
+	s = move[0]
+	m = move[1]
+	start[s].remove(start[s][-1])
+	start[s].append(replace)
+	start[m].remove(start[m][-1])
+	start[m].append(back_track)	
+	return start	
+
+def message(player,status):
+	if status == 0:
+		return '%r Captured Pieces %s' % (player, p)
+	elif status == 1:
+		return 'Thats your peice, can\'t move their'
+	elif status == 2:
+		return 'You cant move their'
+	elif status == 3:
+		return 'That move puts you in CHECK try again'
+	elif status == 4:
+		return  '%s YOU ARE IN CHECK!!' %player[0]
+
 board = Board('a1')
 game = Game() 
-last_move = 0
+last_move = []
 back_track = 0
 s = 0 
 m = 0
@@ -901,7 +921,7 @@ p2_move = 0
 end = 0
 cp1 = ''
 cp2 = ''
-
+status = 0
 
 while end != 1:
 	sboard = [start[8][-1][1],start[16][-1][1],start[24][-1][1],start[32][-1][1],
@@ -967,7 +987,7 @@ while end != 1:
 	if check == True:
 		threat = start[king.threat][-1]
 		if king.block(m,threat) == True:
-			print '%s YOU ARE IN CHECK!!' %player[0]
+			status = 4
 			
 		else:		
 			if king.mate(m,threat) == True:
@@ -979,21 +999,16 @@ while end != 1:
 				if len(take) == 1:
 					s = take[0]
 					m = king.threat
+					change = [s,m]
 					replace = start[s][-1]
 					last_move = start[s][-1]
 					back_track = start[m][-1]
-					start[s].remove(start[s][-1])
-					start[s].append([' ',' ',0])
-					start[m].remove(start[m][-1])
-					start[m].append(replace)
+					start = update(change,replace,start)
 					king = King(player,start)
 					king.player = player
 					king.game = start
 					check = king.handler()
-					start[s].remove(start[s][-1])
-					start[s].append(replace)
-					start[m].remove(start[m][-1])
-					start[m].append(back_track)
+					start = back_track(change,replace,back_track,start)
 					if check == True:
 						king = King(player,start)
 						retry =	Piece(king.king, start[king.king][-1], start)
@@ -1004,21 +1019,16 @@ while end != 1:
 								
 								s = king.king
 								m = pos[x] 
+								change = [s,m]
 								replace = start[s][-1]
 								last_move = start[s][-1]
 								back_track = start[m][-1]
-								start[s].remove(start[s][-1])
-								start[s].append([' ',' ',0])
-								start[m].remove(start[m][-1])
-								start[m].append(replace)
+								start = update(change,replace,start)
 								king = King(player,start)
 								king.player = player
 								king.game = start
 								check = king.handler()
-								start[s].remove(start[s][-1])
-								start[s].append(replace)
-								start[m].remove(start[m][-1])
-								start[m].append(back_track)
+								start = back_track(change,replace,back_track,start)
 								if check == True:
 									c += 1
 							if c == len(pos):
@@ -1026,9 +1036,9 @@ while end != 1:
 								end = 1
 								break
 							else: 
-								print '%s YOU ARE IN CHECK' % player[0]
+								status = 4
 					else:
-						print '%s YOU ARE IN CHECK' % player[0]
+						status = 4
 						
 				else:
 					mate = king.mate(king.threat,threat)
@@ -1040,13 +1050,11 @@ while end != 1:
 						check = king.handler()
 						s = mate[x]
 						m = king.threat
+						change = [s,m]
 						replace = start[s][-1]
 						last_move = start[s][-1]
 						back_track = start[m][-1]
-						start[s].remove(start[s][-1])
-						start[s].append([' ',' ',0])
-						start[m].remove(start[m][-1])
-						start[m].append(replace)
+						start = update(change,replace,start)
 						king = King(player,start)
 						king.player = player
 						king.game = start
@@ -1055,10 +1063,7 @@ while end != 1:
 						if check == True:
 							tally += 1
 						
-						start[s].remove(start[s][-1])
-						start[s].append(replace)
-						start[m].remove(start[m][-1])
-						start[m].append(back_track)
+						start = back_track(change,replace,back_track,start)
 						
 						
 						
@@ -1068,8 +1073,7 @@ while end != 1:
 						end = 1
 						break
 					else:
-				
-						print '%s YOU ARE IN CHECK!!' %player[0]
+						status = 4
 	
 			elif king.take(king.threat) != type(True) and king.take(king.threat) == False:
 				mate = king.mate(king.threat,threat)
@@ -1080,13 +1084,11 @@ while end != 1:
 					check = king.handler()
 					s = king.king
 					m = mate[x]
+					change = [s,m]
 					replace = start[s][-1]
 					last_move = start[s][-1]
 					back_track = start[m][-1]
-					start[s].remove(start[s][-1])
-					start[s].append([' ',' ',0])
-					start[m].remove(start[m][-1])
-					start[m].append(replace)
+					start = update(change,replace,start)
 					king = King(player,start)
 					king.player = player
 					king.game = start
@@ -1094,28 +1096,24 @@ while end != 1:
 					
 					if check == True:
 						tally += 1
-					
-					start[s].remove(start[s][-1])
-					start[s].append(replace)
-					start[m].remove(start[m][-1])
-					start[m].append(back_track)
-					
-					
+						
+					start = back_track(change,replace,back_track,start)
 					
 				if tally == len(read):
 					print 'GAME OVER %s WINS!' % opponent[0]
 					end = 1
 					break
 				else:
-			
-					print '%s YOU ARE IN CHECK!!' %player[0]
-	else:
-		print player, 'Captured Pieces %s'%p
-	print 'here', board.point['c1'],board.point['g1'],board.point['c8'],board.point['g8'],board.point['e1'],board.point['e8']
+					status = 4
+	
+	print message(player,status)
+	status = 0
+	
 	move = getmove(player)
 	
 	w_castle =[17,49]
 	b_castle = [24,56]
+	
 	if move[0] == 33 and start[33][-1][-2] == 'K' and w_castle.count(move[1]) == 1:
 		s = move[0]
 		m = move[1]
@@ -1263,10 +1261,6 @@ while end != 1:
 			else:
 					turn = 1 
 	else:	
-		# I am saving this#############
-		#space for options when i get##   
-		#to it ########################
-		############################### \\\OPTIONS///
 		rmove = move
 		s = rmove[0]
 		m = rmove[1]
@@ -1274,7 +1268,7 @@ while end != 1:
 		peice = Piece( s, start[s][-1], start)
 		pos = peice.pos_handler()
 		if pos == False:
-			print '%s your move, that last one wasn\'t a real move =>'%player[0]
+			print '%s your move, that last one wasn\'t a real move'%player[0]
 			#move = test(moxi,player[-1]) ##for testing 
 		
 			getmove(player)
@@ -1284,98 +1278,62 @@ while end != 1:
 		elif pos.count(m) == 1:
 			if start[m][-1][-2] == ' ' or start[m][-1][-1] == opponent[1] :
 			
-				if start[m][-1][-1] == opponent[1]:
+				replace = start[s][-1]
+				last_move.append(start[s][-1])
+				back_track = start[m][-1]
 				
-					replace = start[s][-1]
-					last_move = start[s][-1]
-					back_track = start[m][-1]
-					start[s].remove(start[s][-1])
-					start[s].append([' ',' ',0])
-					start[m].remove(start[m][-1])
-					start[m].append(replace)
-					king = King(player,start)
-					check = king.handler()
-					
-					if start[m][-1][-2] == 'P' and check == False:
-						start[m][-1][0] += 1
-						if m % 8 == 1 or m % 8 == 0:
-							print 'Congrats your Pawn made it to the other side of the board!'
-							an = raw_input('What would you like to be? \n B, H, R, Q >>> ')
-							start[m][-1][-2]  = an.capitalize()
-							start[m][-1][1] = game.key(start[m][-1])
-					if check == True:
-						p.remove(p[-1])
-						start[s].remove(start[s][-1])
-						start[s].append(replace)
-						start[m].remove(start[m][-1])
-						start[m].append(back_track)
-						print 'That move puts you in CHECK try again'
-						if turn == 1 :
-							turn = 2
-						else:
-							turn = 1 
+				start = update(rmove,replace,start)
+				king = King(player,start)
+				check = king.handler()
+				
+				if start[m][-1][-2] == 'P' and check == False:
+					if player[-1] == 'white':
+						if s % 8 == 5:
+							if s + 9 == m and start[s+8][-1][0] == 1:
+								start[s+8].remove(start[s+8][-1])
+								start[s+8].append([' ',' ',0])
+								cp1 = cp1 + start[s+8][-1][-3] + ' '
+							elif s - 7 == m and start[s-8][-1][0] == 1:
+								start[s-8].remove(start[s-8][-1])
+								start[s-8].append([' ',' ',0])
+								cp1 = cp1 + start[s-8][-1][-3] + ' '
+					else:	
+						if s % 8 == 4:
+							if s - 9 == m and start[s-8][-1][0] == 1:
+								start[s-8].remove(start[s-8][-1])
+								start[s-8].append([' ',' ',0])
+								cp2 = cp2 + start[s-8][-1][-3] + ' '
+							elif s + 7 == m and start[s+8][-1][0] == 1:
+								start[s+8].remove(start[s+8][-1])
+								start[s+8].append([' ',' ',0])
+								cp2 = cp2 + start[s+8][-1][-3] + ' '
+					start[m][-1][0] += 1
+					if m % 8 == 1 or m % 8 == 0:
+						print 'Congrats your Pawn made it to the other side of the board!'
+						an = raw_input('What would you like to be? \n B, H, R, Q >>> ')
+						start[m][-1][-2]  = an.capitalize()
+						start[m][-1][1] = game.key(start[m][-1])
+				if check == True:
+					start = back_track(rmove,replace,back_track,start)
+					status = 3
+					if turn == 1 :
+						turn = 2
+					else:
+						turn = 1 
+				if back_track[-1] != player[-1]:
 					if player[-1] == 'white':
 						cp1 = cp1 + back_track[-3] + ' '
 					else:
 						cp2 = cp2 + back_track[-3] + ' '
-				else:
-					replace = start[s][-1]
-					last_move = start[s][-1]
-					back_track = start[m][-1]
-					start[s].remove(start[s][-1])
-					start[s].append([' ',' ',0])
-					start[m].remove(start[m][-1])
-					start[m].append(replace)
-					king = King(player,start)
-					check = king.handler()
-					if start[m][-1][-2] == 'P' and check == False:
-						if player[-1] == 'white':
-							if s % 8 == 5:
-								if s + 9 == m:
-									start[s+8].remove(start[s+8][-1])
-									start[s+8].append([' ',' ',0])
-								elif s - 7 == m:
-									start[s-8].remove(start[s-8][-1])
-									start[s-8].append([' ',' ',0])
-						else:	
-							if s % 8 == 4:
-								if s - 9 == m:
-									start[s-8].remove(start[s-8][-1])
-									start[s-8].append([' ',' ',0])
-								elif s + 7 == m:
-									start[s+8].remove(start[s+8][-1])
-									start[s+8].append([' ',' ',0])
-						
-						start[m][-1][0] += 1
-						if m % 8 == 1 or m % 8 == 0:
-							print 'Congrats your Pawn made it to the other side of the board!'
-							 
-							an = raw_input('What would you like to be? \n B, H, R, Q >>> ')
-							start[m][-1][-2] = an.capitalize()
-							start[m][-1][1] = game.key(start[m][-1])
-					if check == True:
-						start[s].remove(start[s][-1])
-						start[s].append(replace)
-						start[m].remove(start[m][-1])
-						start[m].append(back_track)
-						print 'That move puts you in CHECK try again'
-						
-						break
-						if turn == 1 :
-							turn = 2
-						else:
-							turn = 1 
-					
+				
 			else:
-				print 'Thats your peice, can\'t move their'
+				status = 1
 				if turn == 1 :
 					turn = 2
 				else:
 					turn = 1 
 		else:
-			print moxi,move,peice.possible(),pos,s,m
-			print 'You cant move their' 
-			
+			status = 2
 			if turn == 1 :
 				turn = 2
 			else:
