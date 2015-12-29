@@ -11,9 +11,9 @@ class Board(object):
 		for x in xrange(1,65):
 			if y > 8: 
 				y = 1
-			if z > 1:
-				z = 0
+			if z == 1:
 				color = 'black'
+				z = 0
 			else:
 				color = 'white'
 			if x <= 8:
