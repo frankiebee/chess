@@ -3,13 +3,13 @@ class Board(object):
 	def __init__(self,x):
 		self.x = x.lower()
 		self.trans = {} # translater
-		self.point = {} 
-		
+		self.point = {} #board
+
 		y = 1
 		z = 0
 		color = 'black'
 		for x in xrange(1,65):
-			if y > 8: 
+			if y > 8:
 				y = 1
 			if z == 1:
 				color = 'black'
@@ -20,70 +20,70 @@ class Board(object):
 				self.point ['a%d'%y] = [x,z]
 	 			self.trans [x] = ['a%d'%x,color]
 			elif x > 8  and x < 17:
-				self.point ['b%d'%y] = [x, z] 
-				self.trans [x] = ['b%d'%y,color] 
+				self.point ['b%d'%y] = [x, z]
+				self.trans [x] = ['b%d'%y,color]
 			elif x > 16  and x < 25:
-				self.point ['c%d'%y] = [x, z] 
+				self.point ['c%d'%y] = [x, z]
 				self.trans [x] = ['c%d'%y,color]
 
 			elif x > 24  and x < 33 :
-				self.point ['d%d'%y] = [x, z] 
+				self.point ['d%d'%y] = [x, z]
 				self.trans [x] = ['d%d'%y,color]
-	
+
 			elif x > 32  and x < 41:
-				self.point ['e%d'%y] = [x, z] 
+				self.point ['e%d'%y] = [x, z]
 				self.trans [x] = ['e%d'%y,color]
-	
+
 			elif x > 40  and x < 49:
-				self.point ['f%d'%y] = [x, z] 
+				self.point ['f%d'%y] = [x, z]
 				self.trans [x] = ['f%d'%y,color]
-	
+
 			elif x > 48  and x < 57:
-				self.point ['g%d'%y] = [x, z] 
+				self.point ['g%d'%y] = [x, z]
 				self.trans [x] = ['g%d'%y,color]
-	
+
 			elif x > 56  and x <= 64 :
-				self.point ['h%d'%y] = [x, z] 
+				self.point ['h%d'%y] = [x, z]
 				self.trans [x] = ['h%d'%y,color]
-			
+
 			y += 1
 			z += 1
 			if x % 8 == 0:
 				z = z - 1
-			
-				
+
+
 		self.start = self.check()
-		
-		
+
+
 	def check(self,x = '' ,option = '',key = 0):
 		if x == '':
 			x = self.x
-		
+
 		if option.lower() == 'color':
-			
+
 			return self.point[self.x]
 		elif option.lower() == 'key':
 			pin = []
 			if type(key) == type([0]):
 				for x in range(len(key)):
 					if type(key[x]) == type([None]):
-						key[x] = key[x][0] 
+						key[x] = key[x][0]
 					else:
 						pass
 					pin.append(self.trans[key[x]])
 				return pin
 			return self.trans[key]
-		
+
 		else:
 			return(self.point[x][0])
-	
+
 	def visit(self):
-		visit = []	
+		visit = []
 		for x in range(65):
 			if x != self.start:
 				visit.append(x)
-		return visit, 
-	
+		return visit,
+
 	def legal(self,start ,move):
 		if move > 0 and move <= 64:
 			if start % 8 == 0 or start % 8 == 7:
@@ -91,21 +91,21 @@ class Board(object):
 					return False
 				else:
 					return True
-						
+
 			elif start % 8 == 1 or start % 8 == 2:
 				if move % 8 == 0 or move % 8 == 7 or move % 8 == 6:
 					return False
 				else:
-					return True							
+					return True
 			else:
 				return True
 		else:
 			return False
-	
+
 	def sanity_check(self,x,y):
 		check = y.count(x)
 		return check
-	
+
 	def play(self):
 		board = self.trans
 		for x in range(1,65):
@@ -121,7 +121,7 @@ class Board(object):
 				else:
 					p = u'\u2659'
 				board[x].append([0,p,'P',y])
-			elif x == 1 or x == 8 or x == 64 or x == 57: 
+			elif x == 1 or x == 8 or x == 64 or x == 57:
 				if y == 'white':
 					p = u'\u265C'
 				else:
@@ -153,9 +153,9 @@ class Board(object):
 				board[x].append([0,p,'K',y])
 			else:
 				board[x].append([' ',' ',y])
-				
+
 		return board
-	
+
 	def go(self,start,move):
 		s = self.check(start)
 		m = self.check (move)
@@ -163,12 +163,12 @@ class Board(object):
 			return [s,m]
 		else:
 			return 'Sory not a legal move'
- 
+
 class Piece(object):
 
 	def __init__(self,start,type,game):
 		self.start = start
-		
+
 		self.type = type
 		self.game = game
 	def check(self,check):
@@ -181,21 +181,21 @@ class Piece(object):
 					if start % 8 == 0 or start % 8 == 7:
 						if z % 8 != 1 and z % 8 != 2:
 							y.append(z)
-						
+
 					elif start % 8 == 1 or start % 8 == 2:
 						if z % 8 != 0 and z % 8 != 7 and z % 8 != 6:
-							y.append(z)							
+							y.append(z)
 					else:
 						y.append(z)
-			
-			return y	
-	def possible(self):	
+
+			return y
+	def possible(self):
 		adress = Board('a1')
 		if self.type[-2] == 'P':
 			if self.start % 8 == 2 and self.type[-1] == 'white':
 				a = self.start + 1
 				b = self.start + 2
-				x = self.start + 9 
+				x = self.start + 9
 				y = self.start - 7
 				new = [[a],[b]]
 				if x < 65 :
@@ -205,10 +205,10 @@ class Piece(object):
 					if self.game[y][-1][-1] != 0 and  self.game[y][-1][-1] != self.type[-1]:
 						new.append([y])
 				return new
-			elif self.start % 8 == 7 and self.type[-1] == 'black':	
+			elif self.start % 8 == 7 and self.type[-1] == 'black':
 				a = self.start - 1
 				b = self.start - 2
-				x = self.start - 9 
+				x = self.start - 9
 				y = self.start + 7
 				new = [[a],[b]]
 				if x > 0 :
@@ -228,14 +228,14 @@ class Piece(object):
 					if x <= 64 and self.game[x][-1][-2] != ' ' and self.type[-1] != self.game[x][-1][-1] :
 						b = x
 					elif x <= 64 and self.game[x][-1][-2] == ' ' and self.start % 8== 5:
-						if self.game[self.start + 8][-1][-1] != self.type[-1] and self.game[self.start + 8][-1][0] == 1: 
+						if self.game[self.start + 8][-1][-1] != self.type[-1] and self.game[self.start + 8][-1][0] == 1:
 							b = x
-				
+
 					if y > 0:
 						if self.game[y][-1][-2] != ' ' and self.type[-1] != self.game[y][-1][-1] :
 							c = y
 					elif y > 0 and self.game[y][-1][-2] == ' ' and self.start % 8 == 5:
-						if self.game[self.start - 8][-1][-1] != self.type[-1] and self.game[self.start - 8][-1][0] == 1: 
+						if self.game[self.start - 8][-1][-1] != self.type[-1] and self.game[self.start - 8][-1][0] == 1:
 							c = y
 					r = [a,b,c]
 					new =[]
@@ -243,8 +243,8 @@ class Piece(object):
 						if r[x] == None:
 							pass
 						else:
-							
-							new.append([r[x]])	 
+
+							new.append([r[x]])
 					if len(new) != 0:
 						return new
 					else:
@@ -258,13 +258,13 @@ class Piece(object):
 					if x <= 64 and self.game[x][-1][-2] != ' ' and self.type[-1] != self.game[x][-1][-1] :
 						b = x
 					elif x <= 64 and self.game[x][-1][-2] == ' ' and self.start % 8 == 4:
-						if self.game[self.start + 8][-1][-1] != self.type[-1] and self.game[self.start + 8][-1][0] == 1: 
+						if self.game[self.start + 8][-1][-1] != self.type[-1] and self.game[self.start + 8][-1][0] == 1:
 							b = x
 					if y > 0:
 						if self.game[y][-1][-2] != ' ' and self.type[-1] != self.game[y][-1][-1] :
 							c = y
 						elif self.game[y][-1][-2] == ' ' and self.start % 8 == 4:
-							if self.game[self.start - 8][-1][-1] != self.type[-1] and self.game[self.start - 8][-1][0] == 1: 
+							if self.game[self.start - 8][-1][-1] != self.type[-1] and self.game[self.start - 8][-1][0] == 1:
 								c = y
 					r = [a,b,c]
 					new =[]
@@ -272,95 +272,95 @@ class Piece(object):
 						if r[x] == None:
 							pass
 						else:
-							new.append([r[x]])	 
+							new.append([r[x]])
 					if len(new) != 0:
 						return new
 					else:
 						return None
-					  
+
 		elif self.type[-2] == 'R':
 			start = self.start + 8
 			x = []
 			w = []
 			y = []
 			z = []
-			if start <= 64:	
+			if start <= 64:
 				while start <= 64:
 					x.append(start)
 					start += 8
 			else:
 				x = None
-			
+
 			start = self.start - 8
-			
+
 			if start > 0:
 				while start >= 1:
 					w.append(start)
 					start -= 8
 			else:
 				w = None
-			
+
 			start = self.start + 1
-			
+
 			if self.start % 8 != 0:
 				while start % 8 != 1:
 					y.append(start)
 					start += 1
 			else:
 				y = None
-			
+
 			start = self.start - 1
-			
+
 			if self.start % 8 != 1:
 				while start % 8 != 0:
 					z.append(start)
 					start -= 1
 			else:
-				z = None  
+				z = None
 			return [x,w,y,z]
-					
+
 		elif self.type[-2] == 'H':
 			start = self.start
 			a = start - 15
 			b =	start - 6
 			c =	start + 10
 			d =	start + 17
-			e =	start + 15 
+			e =	start + 15
 			f =	start + 6
 			g =	start - 10
-			h =	start - 17 
+			h =	start - 17
 			posible = [ a, b, h, d, e, f, g, c]
 			legal = self.legal(posible,start)
 			return [legal]
-		
+
 		elif self.type[-2] == 'B':
-			
+
 			start = self.start + 9
 			x = []
 			w = []
 			y = []
 			z = []
-			if start <= 64 and adress.legal(start - 9,start) == True:	
+			if start <= 64 and adress.legal(start - 9,start) == True:
 				while start <= 64 and adress.legal(start - 9,start) == True:
-					
+
 					x.append(start)
 					start += 9
-				
+
 			else:
 				x = None
-			
+
 			start = self.start - 9
 			if start > 0 and adress.legal(start + 9,start) == True:
 				while start >= 1 and adress.legal(start + 9,start) == True:
-					
+
 					w.append(start)
 					start -= 9
 			else:
 				w = None
 			start = self.start +7
-			if start <= 64 and adress.legal(start - 7,start) == True:	
+			if start <= 64 and adress.legal(start - 7,start) == True:
 				while start <= 64 and adress.legal(start - 7,start) == True:
-						
+
 					y.append(start)
 					start += 7
 			else:
@@ -368,12 +368,12 @@ class Piece(object):
 			start = self.start - 7
 			if start > 0 and adress.legal(start + 7,start) == True:
 				while start >= 1 and adress.legal(start + 7,start) == True:
-					
+
 					z.append(start)
 					start -= 7
 			else:
 				z = None
-			
+
 			return [x,w,y,z]
 		elif self.type[-2] == 'Q':
 			start = self.start + 8
@@ -381,7 +381,7 @@ class Piece(object):
 			b = []
 			c = []
 			d = []
-			if start <= 64:	
+			if start <= 64:
 				while start <= 64:
 					a.append(start)
 					start += 8
@@ -407,14 +407,14 @@ class Piece(object):
 					d.append(start)
 					start -= 1
 			else:
-				d = None  
+				d = None
 			start = self.start + 9
 			x = []
 			w = []
 			y = []
 			z = []
-			if start <= 64 and adress.legal(self.start,start) == True:	
-				
+			if start <= 64 and adress.legal(self.start,start) == True:
+
 				while start <= 64 and start % 8 != 1:
 					x.append(start)
 					start += 9
@@ -428,7 +428,7 @@ class Piece(object):
 			else:
 				w = None
 			start = self.start +7
-			if start <= 64 and adress.legal(self.start,start) == True:	
+			if start <= 64 and adress.legal(self.start,start) == True:
 				while start <= 64 and adress.legal(self.start,start) == True:
 					z.append(start)
 					start += 7
@@ -441,10 +441,10 @@ class Piece(object):
 					start -= 7
 			else:
 				y = None
-			
-			
+
+
 			return[a,b,c,d,x,w,y,z]
-		
+
 		elif self.type[-2] == 'K':
 			start = self.start
 			a = start + 1
@@ -458,18 +458,18 @@ class Piece(object):
 			possible = [a,b,c,d,e,f,g,h]
 			legal = self.legal(possible,start)
 			return [legal]
-	def pos_handler(self): 
-		pos = self.possible()		
+	def pos_handler(self):
+		pos = self.possible()
 		new =[]
-		
+
 		if pos == None:
 			return False
-		
+
 		for x in range(len(pos)):
-			
+
 			if pos[x] == [None]:
 				pass
-			
+
 			elif self.type[-2] == 'H' or self.type[-2] == 'K' :
 				if pos[x] != None:
 					for x in range(len(pos[0])):
@@ -477,9 +477,9 @@ class Piece(object):
 						postion = self.game[check][-1][-2]
 						if postion == ' ':
 							new.append(check)
-						elif self.type[-1] != self.game[check][-1][-1]:		
-							new.append(check)	
-			else:			
+						elif self.type[-1] != self.game[check][-1][-1]:
+							new.append(check)
+			else:
 				if pos[x] != None:
 					for y in range(len(pos[x])):
 						check = pos[x][y]
@@ -500,19 +500,19 @@ class Piece(object):
 								break
 						else:
 							break
-		
+
 		else:
 			return new
 	def mov_handler(self):
 		pass
-		
+
 class King(object):
 	def __init__(self,player,game):
-		self.king = 0 
+		self.king = 0
 		self.game = game
 		self.opponent = []
 		self.player = player
-		self.players_p = [] 
+		self.players_p = []
 		self.threat = 0
 		for x in range(1,65):
 			if game[x][-1][-2] == 'K' and game[x][-1][-1] == player[-1]:
@@ -525,35 +525,35 @@ class King(object):
 		game = self.game
 		o = self.opponent
 		for x in range(len(o)):
-			piece = Piece(o[x][0],o[x][-1],game)	
+			piece = Piece(o[x][0],o[x][-1],game)
 			pos = piece.pos_handler()
-			
+
 			if pos == False:
 				pass
 			else:
 				if pos.count(self.king) == 1:
 					self.threat = o[x][0]
-					return True   	
-		return False  	
-			
+					return True
+		return False
+
 	def block(self,oppo,type): #opponent peice threatning the king and type
-		game = self.game 
+		game = self.game
 		if type[-2] == 'H':
-			return False				 
+			return False
 		else:
-			opponent = Piece(oppo,type, game)  
-			opos = opponent.pos_handler()		
+			opponent = Piece(oppo,type, game)
+			opos = opponent.pos_handler()
 			pace = oppo - self.king
 			line = []
 			peice = self.players_p
 			if pace % 7 == 0:
 				pace = 7
-			elif pace % 8 == 0:	
+			elif pace % 8 == 0:
 				pace = 8
 			elif pace % 9 == 0:
 				pace = 9
 			elif pace % 1 == 0:
-				pace = 1 
+				pace = 1
 			opos.sort()
 			for a in range(len(opos)):
 		 		if pace == 1:
@@ -563,16 +563,16 @@ class King(object):
 		 				read += 1
 		 		elif (opos[a] - oppo) % pace == 0:
 					line.append(opos[a])
-			
-			for x in range(len(peice)):	 
+
+			for x in range(len(peice)):
 				player = Piece(peice[x][0],peice[x][-1], game)
 				pos = player.pos_handler()
 				if pos != False:
 					for y in range(len(line)):
 						if pos.count(line[y]) == 1 and peice[x][-1][-2] != 'K':
-							return True 
-							
-			return False 	
+							return True
+
+			return False
 	def test(self):
 		self.game
 	def take(self,oppo):
@@ -587,7 +587,7 @@ class King(object):
 		if len(new) == 0:
 			return False
 		else:
-			return new	
+			return new
 		return True
 
 	def mate(self,lmove,type): #self, and the move that put in check
@@ -599,13 +599,13 @@ class King(object):
 			new.append(re[x])
 		"""
 		we see if were in check..
-		then if we can take what puts us in check 
-		then block 
+		then if we can take what puts us in check
+		then block
 		then move
-	
+
 		"""
 		if self.take(lmove) == False:
-			
+
 			if self.block(lmove,game[lmove][-1]) == False:
 				for x in range(len(self.opponent)):
 					o = self.opponent[x]
@@ -615,10 +615,10 @@ class King(object):
 						opi = op.pos_handler()
 						if o[-1][-2] == 'P':
 							if o[-1][-1] == 'white':
-								x = o[0] + 9 
+								x = o[0] + 9
 								a =	o[0] - 7
-							else:	
-								x = o[0] - 9 
+							else:
+								x = o[0] - 9
 								a =	o[0] + 7
 							opi.append(x)
 							opi.append(a)
@@ -627,7 +627,7 @@ class King(object):
 								new.remove(read[y])
 							except ValueError:
 								pass
-						 
+
 				if len(new) == 0:
 					return True
 				else:
@@ -635,7 +635,7 @@ class King(object):
 		elif self.take(lmove) != False:
 			if len(self.take(lmove)) == 1:
 				x = self.take(lmove)
-				if self.king == x[0]: 
+				if self.king == x[0]:
 					replace = game[s][-1]
 					last_move = game[s][-1]
 					back_track = game[m][-1]
@@ -650,11 +650,11 @@ class King(object):
 					game[m].remove(game[m][-1])
 					game[m].append(back_track)
 					if check == True:
-						
+
 						return True
-					
+
 		return self.take(lmove)
-				
+
 def test(m,player):
 	fuckme = """e2e4
 e7e6
@@ -725,8 +725,8 @@ d8e7
 g7g8
 
 """
-	
-	fuckme = fuckme.split('\n')	
+
+	fuckme = fuckme.split('\n')
 	white = []
 	black = []
 	turn = 1
@@ -736,48 +736,48 @@ g7g8
 		if turn == 1:
 			white.append(fuckme[a])
 			turn = 2
-		
+
 		else:
 			black.append(fuckme[a])
 			turn = 1
 	if player == 'black':
 		return black[m]
 	else:
-		return white[m]					
-	
+		return white[m]
+
 class Game(object):
 	def __init__(self):
 		print """
 		Hello! to play a game of chess hit ENTER
-		If during the game help is required just 
-		type any of the below comands 
+		If during the game help is required just
+		type any of the below comands
 		\\\OPTIONS Menue///
-		|HELP        : Default will show options , 
+		|HELP        : Default will show options ,
 		help option will show details on opion
-		
+
 		|CHECK	    : shows the peice that puts you in check
-		
+
 		|MENUE	    : shows Options menue
-		
+
 		"""
 		step = raw_input()
-	
+
 		self.player_one = [raw_input('player ones name => '),'white']
 		self.player_two	= [raw_input('player twos name => '),'black']
-	
+
 	def options_menue(self,player,option,game):
 		option = option.strip(' ')
 		menue = """
-		\\\OPTIONS Menue///
-		|HELP        : Default will show options , 
-		help option will show details on opion
-		
-		|CHECK	    : shows the peice that puts you in check.
-		
-		|MENUE		: shows Options menue.
-		
+		\\\OPTIONS Menu///
+		|HELP        : Default will show options ,
+		help option will show details on option
+
+		|CHECK	    : shows the piece that puts you in check.
+
+		|MENUE		: shows Options menu.
+
 		|LAST MOVE  : shows last made move.
-		
+
 		|SETINGS 	: ...
 		"""
 		option = option.upper()
@@ -791,60 +791,61 @@ class Game(object):
 				y = menue.find('.',x)
 				print option_two,y
 				return option[space+1:len(option)] + menue[x:y].strip(' ')
-			else:			
+			else:
 				print menue
 				exits = raw_input('HIT ENTER TO EXIT OPTIONS MENUE')
 				return 'stop'
-		
+
 		elif option == 'CHECK':
 			this = King(player,game)
 			check = this.handler()
 			if check == True:
 				return game[this.threat][0],game[this.threat][-1][-3]
-			else: 
-				return 'You are not in CHECK' 
-						
-		else: 
-		 	return 'continue'	
-	
-	
+			else:
+				return 'You are not in CHECK'
+
+		else:
+		 	return 'continue'
+
+
 	def key(self,thing):
 		if thing[-1] == 'black':
-			if thing[-2] == 'Q': 
+			if thing[-2] == 'Q':
 				return u'\u2655'	#queen
 			elif thing[-2] == 'R':
 				return u'\u2656'	#rook
-			elif thing[-2] == 'B':	
+			elif thing[-2] == 'B':
 				return u'\u2657'	#bbishiop
 			elif thing[-2] == 'H':
 				return u'\u2658'	#bknigh
-		else:	
-			if thing[-2] == 'Q':		
-				return u'\u265B' #queen	
-			elif thing[-2] == 'R':	
-				return u'\u265C' # rook	
-			elif thing[-2] == 'B':	
-				return u'\u265D' #bishiop white	
-			elif thing[-2] == 'H':	
-				return u'\u265E' #knight white	
-	
+		else:
+			if thing[-2] == 'Q':
+				return u'\u265B' #queen
+			elif thing[-2] == 'R':
+				return u'\u265C' # rook
+			elif thing[-2] == 'B':
+				return u'\u265D' #bishiop white
+			elif thing[-2] == 'H':
+				return u'\u265E' #knight white
+
 	def trans(self,move):
-		try:
-			move = move.strip(' ')
-			rmove = [move[0:2],move[-2]+ move[-1]]
-			s = rmove[0]
-			m = rmove[1]
-			rmove = [board.check(s),board.check(m)]
-			s = rmove[0]
-			m = rmove[1]
-		except:
-			move = raw_input('%s your move, I didn\'t understand that last one =>'%player[0])
-			#move = test(moxi,player[-1]) #### for testing
-			rmove = [move[0:2],move[-2]+ move[-1]]
-			s = rmove[0]
-			m = rmove[1]
-			rmove = [board.check(s),board.check(m)]
-		return rmove 
+		while True:
+			try:
+				move = move.strip(' ')
+				rmove = [move[0:2],move[-2]+ move[-1]]
+				s = rmove[0]
+				m = rmove[1]
+				rmove = [board.check(s),board.check(m)]
+				s = rmove[0]
+				m = rmove[1]
+			except:
+				move = raw_input('%s your move, I didn\'t understand that last one =>'%player[0])
+				#move = test(moxi,player[-1]) #### for testing
+				rmove = [move[0:2],move[-2]+ move[-1]]
+				s = rmove[0]
+				m = rmove[1]
+				rmove = [board.check(s),board.check(m)]
+			return rmove
 
 def getmove(player):
 	move = raw_input('%s your move =>'%player[0])
@@ -865,10 +866,10 @@ def getmove(player):
 			move = raw_input('%s your move =>'%player[0])
 		elif this == 'continue':
 			rmove = game.trans(move)
-			break			
+			break
 	return rmove
 def show_me(state,type):
-	pass 
+	pass
 
 def update(move,replace,start):
 	s = move[0]
@@ -885,8 +886,8 @@ def back_track(move,rplace,back_track,start):
 	start[s].remove(start[s][-1])
 	start[s].append(replace)
 	start[m].remove(start[m][-1])
-	start[m].append(back_track)	
-	return start	
+	start[m].append(back_track)
+	return start
 
 def message(player,status):
 	if status == 0:
@@ -901,13 +902,13 @@ def message(player,status):
 		return  '%s YOU ARE IN CHECK!!' %player[0]
 
 board = Board('a1')
-game = Game() 
+game = Game()
 last_move = []
 back_track = 0
-s = 0 
+s = 0
 m = 0
 replace = 0
-global moxi ## for testing 
+global moxi ## for testing
 moxi = -1 ## for testin
 start = board.play() # this is board data
 play = [] # not used yet
@@ -922,7 +923,11 @@ end = 0
 cp1 = ''
 cp2 = ''
 status = 0
-
+"""
+While game statrts bellow this string above it we have class obj
+moxi is used for the testing module and has a pre loaded game in it
+update() and back_track() are used to change the state of the board
+"""
 while end != 1:
 	sboard = [start[8][-1][1],start[16][-1][1],start[24][-1][1],start[32][-1][1],
     	start[40][-1][1],start[48][-1][1],start[56][-1][1],start[64][-1][1],
@@ -967,18 +972,18 @@ while end != 1:
 		[-] |[h][g][f][e][d][c][b][a]
 		"""% tuple(sboard)
 	if turn == 1:
-		player = p1 
+		player = p1
 		p =  cp1
 		opponent = p2
 		o = cp2
 		turn = 2
 		moxi += 1
 	else:
-		player = p2 
+		player = p2
 		p = cp2
 		opponent = p1
 		o = cp1
-		turn = 1  
+		turn = 1
 	king = King(player,start)
 	check = king.handler()
 	king.test()
@@ -988,8 +993,8 @@ while end != 1:
 		threat = start[king.threat][-1]
 		if king.block(m,threat) == True:
 			status = 4
-			
-		else:		
+
+		else:
 			if king.mate(m,threat) == True:
 				print 'GAME OVER %s WINS!' % opponent[0]
 				end = 1
@@ -1016,9 +1021,9 @@ while end != 1:
 						if  pos != None:
 							c = 0
 							for x in range(len(pos)):
-								
+
 								s = king.king
-								m = pos[x] 
+								m = pos[x]
 								change = [s,m]
 								replace = start[s][-1]
 								last_move = start[s][-1]
@@ -1035,14 +1040,14 @@ while end != 1:
 								print 'GAME OVER %s WINS!' % opponent[0]
 								end = 1
 								break
-							else: 
+							else:
 								status = 4
 					else:
 						status = 4
-						
+
 				else:
 					mate = king.mate(king.threat,threat)
-					
+
 					read = mate
 					tally = 0
 					for x in range(len(read)):
@@ -1059,22 +1064,22 @@ while end != 1:
 						king.player = player
 						king.game = start
 						check = king.handler()
-						
+
 						if check == True:
 							tally += 1
-						
+
 						start = back_track(change,replace,back_track,start)
-						
-						
-						
-					
+
+
+
+
 					if tally == len(read):
 						print 'GAME OVER %s WINS!' % opponent[0]
 						end = 1
 						break
 					else:
 						status = 4
-	
+
 			elif king.take(king.threat) != type(True) and king.take(king.threat) == False:
 				mate = king.mate(king.threat,threat)
 				read = mate
@@ -1093,27 +1098,27 @@ while end != 1:
 					king.player = player
 					king.game = start
 					check = king.handler()
-					
+
 					if check == True:
 						tally += 1
-						
+
 					start = back_track(change,replace,back_track,start)
-					
+
 				if tally == len(read):
 					print 'GAME OVER %s WINS!' % opponent[0]
 					end = 1
 					break
 				else:
 					status = 4
-	
+
 	print message(player,status)
 	status = 0
-	
+
 	move = getmove(player)
-	
+
 	w_castle =[17,49]
 	b_castle = [24,56]
-	
+
 	if move[0] == 33 and start[33][-1][-2] == 'K' and w_castle.count(move[1]) == 1:
 		s = move[0]
 		m = move[1]
@@ -1129,18 +1134,18 @@ while end != 1:
 			king.player = player
 			king.game = start
 			check = king.handler()
-	
+
 			if check == True:
 				start[s].remove(start[s][-1])
 				start[s].append(replace)
 				start[m].remove(start[m][-1])
 				start[m].append(back_track)
 				print 'That move puts you in CHECK try again'
-		
+
 				if turn == 1 :
 					turn = 2
 				else:
-					turn = 1 
+					turn = 1
 			replace = start[1][-1]
 			last_move = start[1][-1]
 			back_track = start[17][-1]
@@ -1160,7 +1165,7 @@ while end != 1:
 			king.player = player
 			king.game = start
 			check = king.handler()
-	
+
 			if check == True:
 				start[s].remove(start[s][-1])
 				start[s].append(replace)
@@ -1171,8 +1176,8 @@ while end != 1:
 				if turn == 1 :
 					turn = 2
 				else:
-					turn = 1 
-	
+					turn = 1
+
 			replace = start[57][-1]
 			last_move = start[57][-1]
 			back_track = start[41][-1]
@@ -1181,12 +1186,12 @@ while end != 1:
 			start[41].remove(start[41][-1])
 			start[41].append(replace)
 		else:
-			print "Can't castle" 
+			print "Can't castle"
 			if turn == 1 :
 					turn = 2
 			else:
-					turn = 1 
-	elif move[0] == 40 and start[40][-1][-2] == 'K' and b_castle.count(move[1]) == 1: 
+					turn = 1
+	elif move[0] == 40 and start[40][-1][-2] == 'K' and b_castle.count(move[1]) == 1:
 		s = move[0]
 		m = move[1]
 		if  m == 24 and start[16][-1][-1] == 0 and start[24][-1][-1] == 0 and start[32][-1][-1] == 0:
@@ -1201,19 +1206,19 @@ while end != 1:
 			king.player = player
 			king.game = start
 			check = king.handler()
-			
+
 			if check == True:
 				start[s].remove(start[s][-1])
 				start[s].append(replace)
 				start[m].remove(start[m][-1])
 				start[m].append(back_track)
 				print 'That move puts you in CHECK try again'
-	
+
 				if turn == 1 :
 					turn = 2
 				else:
-					turn = 1 
-			else:	
+					turn = 1
+			else:
 				replace = start[8][-1]
 				last_move = start[8][-1]
 				back_track = start[32][-1]
@@ -1221,7 +1226,7 @@ while end != 1:
 				start[8].append([' ',' ',0])
 				start[32].remove(start[32][-1])
 				start[32].append(replace)
-		
+
 		elif m == 56 and start[48][-1][-1] == 0 and start[56][-1][-1] == 0 :
 			replace = start[s][-1]
 			last_move = start[s][-1]
@@ -1234,18 +1239,18 @@ while end != 1:
 			king.player = player
 			king.game = start
 			check = king.handler()
-			
+
 			if check == True:
 				start[s].remove(start[s][-1])
 				start[s].append(replace)
 				start[m].remove(start[m][-1])
 				start[m].append(back_track)
 				print 'That move puts you in CHECK try again'
-				
+
 				if turn == 1 :
 					turn = 2
 				else:
-					turn = 1 
+					turn = 1
 			else:
 				replace = start[64][-1]
 				last_move = start[64][-1]
@@ -1255,37 +1260,37 @@ while end != 1:
 				start[48].remove(start[48][-1])
 				start[48].append(replace)
 		else:
-			print "Can't castle" 
+			print "Can't castle"
 			if turn == 1 :
 					turn = 2
 			else:
-					turn = 1 
-	else:	
+					turn = 1
+	else:
 		rmove = move
 		s = rmove[0]
 		m = rmove[1]
-	
+
 		peice = Piece( s, start[s][-1], start)
 		pos = peice.pos_handler()
 		if pos == False:
 			print '%s your move, that last one wasn\'t a real move'%player[0]
-			#move = test(moxi,player[-1]) ##for testing 
-		
+			#move = test(moxi,player[-1]) ##for testing
+
 			getmove(player)
 			s = rmove[0]
 			m = rmove[1]
-		
+
 		elif pos.count(m) == 1:
 			if start[m][-1][-2] == ' ' or start[m][-1][-1] == opponent[1] :
-			
+
 				replace = start[s][-1]
 				last_move.append(start[s][-1])
 				back_track = start[m][-1]
-				
+
 				start = update(rmove,replace,start)
 				king = King(player,start)
 				check = king.handler()
-				
+
 				if start[m][-1][-2] == 'P' and check == False:
 					if player[-1] == 'white':
 						if s % 8 == 5:
@@ -1297,7 +1302,7 @@ while end != 1:
 								start[s-8].remove(start[s-8][-1])
 								start[s-8].append([' ',' ',0])
 								cp1 = cp1 + start[s-8][-1][-3] + ' '
-					else:	
+					else:
 						if s % 8 == 4:
 							if s - 9 == m and start[s-8][-1][0] == 1:
 								start[s-8].remove(start[s-8][-1])
@@ -1319,24 +1324,24 @@ while end != 1:
 					if turn == 1 :
 						turn = 2
 					else:
-						turn = 1 
+						turn = 1
 				if back_track[-1] != player[-1]:
 					if player[-1] == 'white':
 						cp1 = cp1 + back_track[-3] + ' '
 					else:
 						cp2 = cp2 + back_track[-3] + ' '
-				
+
 			else:
 				status = 1
 				if turn == 1 :
 					turn = 2
 				else:
-					turn = 1 
+					turn = 1
 		else:
 			status = 2
 			if turn == 1 :
 				turn = 2
 			else:
 				turn = 1
-		
+
 
